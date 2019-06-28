@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/taskTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/deleteTaskButton"
+        android:layout_toEndOf="@id/checkTask"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="@string/sample_task_title"
+        android:textColor="#222"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/deleteTaskButton"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="8dp"
+        android:background="@android:color/transparent"
+        android:text="@string/x_button"
+        android:textAllCaps="false"
+        android:textColor="#777"
+        android:textSize="18sp" />
+
+    <CheckBox
+        android:id="@+id/checkTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="8dp" />
+
+
+</RelativeLayout>

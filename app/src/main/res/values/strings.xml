@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">TodoApp</string>
+    <string name="add">Add</string>
+
+    <string name="sample_task_title">This is a very very very long long task title</string>
+    <string name="sample_task_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</string>
+    <string name="hint_task_name">Title</string>
+    <string name="hint_task_Description">Description</string>
+    <string name="x_button">x</string>
+
+</resources>
