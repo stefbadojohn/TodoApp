@@ -3,6 +3,7 @@ package com.example.todoapp.ui;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,9 +23,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_task, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_task, parent, false));
     }
 
     @Override
@@ -51,7 +51,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         TextView taskTitle;
 
         @BindView(R.id.checkTask)
-        TextView checkedTask;
+        CheckBox checkedTask;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
