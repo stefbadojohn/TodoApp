@@ -63,14 +63,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        clearTaskRecyclerView();
         getTasks();
-    }
-
-    public void clearTaskRecyclerView() {
-        int size = taskList.size();
-        taskList.clear();
-        taskAdapter.notifyItemRangeRemoved(0, size);
     }
 
     public void setTasks() {
