@@ -17,11 +17,21 @@ public class DataManager {
         this.tasks.addAll(tasks);
     }
 
-    public void addToTasks(Task task) {
+    public int addToTasks(Task task) {
         tasks.add(task);
+        //task.setId(tasks.size()-1);
+        return tasks.size();
     }
 
     public void removeFromTasks(int position) {
         tasks.remove(position);
+    }
+
+    public void setTaskIsComplete(int id, boolean complete) {
+        tasks.get(id).setIsComplete(complete);
+    }
+
+    public void setTaskTitle(int id, String title) {
+        tasks.get(id).setTitle(title);
     }
 }

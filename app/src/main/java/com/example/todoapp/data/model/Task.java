@@ -5,10 +5,13 @@ public class Task {
     private String title;
     private boolean isComplete;
 
-    public Task(int id, String title) {
-        this.id = id;
+    public Task(String title) {
         this.title = title;
         isComplete = false;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {
@@ -21,5 +24,13 @@ public class Task {
 
     public boolean getIsComplete() {
         return isComplete;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setIsComplete(boolean complete) {
+        isComplete = complete;
     }
 }

@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
-        taskAdapter = new TaskAdapter(taskList);
+        taskAdapter = new TaskAdapter(mainViewModel,taskList);
         taskRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         taskRecyclerView.setAdapter(taskAdapter);
 
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        setTasks();
+        //setTasks();
         compositeDisposable.clear();
     }
 
@@ -75,7 +75,9 @@ public class MainActivity extends AppCompatActivity {
         mainViewModel.getTasks().subscribe(new Observer<List<Task>>() {
             @Override
             public void onSubscribe(Disposable d) {
-
+/*
+                compositeDisposable.add(d);
+*/
             }
 
             @Override
@@ -89,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(Throwable e) {
                 Log.e("getTasks", e.getMessage());
-                Toast.makeText(MainActivity.this, "onError", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "getTasks -> onError", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -101,14 +103,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void addAllToTaskList(List<Task> tasks) {
         taskList.addAll(tasks);
-        notifyDataChangedTaskAdapter();
+        notifyDataChanged();
     }
 
-    public void notifyDataChangedTaskAdapter() {
+    public void notifyDataChanged() {
         taskAdapter.notifyDataSetChanged();
     }
 
-    public void notifyItemInsertedTaskAdapter() {
+    public void notifyItemInserted() {
         int countTasks = taskAdapter.getItemCount();
         taskAdapter.notifyItemInserted(countTasks);
         taskRecyclerView.scrollToPosition(countTasks-1);
@@ -119,12 +121,15 @@ public class MainActivity extends AppCompatActivity {
         if (newTaskTitle.equals("")) {
             return;
         }
-        taskList.add(new Task(1, newTaskTitle));
+        Task task = new Task(newTaskTitle);
+        mainViewModel.addToTasks(task);
+        taskList.add(task);
         clearNewTaskTitle();
-        notifyItemInsertedTaskAdapter();
+        notifyItemInserted();
     }
 
     public void clearNewTaskTitle() {
         taskTitle.setText("");
     }
+
 }
