@@ -1,5 +1,6 @@
 package com.example.todoapp.ui;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,20 +22,42 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
+
     private List<Task> taskList;
     MainViewModel mainViewModel;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public TaskAdapter(MainViewModel viewModel, List<Task> taskList) {
+    private TodoItemActionsListener todoItemActionsListener;
+
+    public List<Task> getTaskList() {
+        return taskList;
+    }
+
+    public void setTaskList(List<Task> taskList) {
+        this.taskList = taskList;
+        notifyDataSetChanged();
+    }
+
+    public TaskAdapter(MainViewModel viewModel, List<Task> taskList, TodoItemActionsListener todoItemActionsListener) {
         mainViewModel = viewModel;
         this.taskList = taskList;
+        this.todoItemActionsListener = todoItemActionsListener;
+    }
+
+    public TodoItemActionsListener getTodoItemActionsListener() {
+        return todoItemActionsListener;
+    }
+
+    public void setTodoItemActionsListener(TodoItemActionsListener todoItemActionsListener) {
+        this.todoItemActionsListener = todoItemActionsListener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_task, parent, false));
+        Context context = parent.getContext();
+        View view = LayoutInflater.from(context).inflate(R.layout.item_task, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -49,11 +72,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
         holder.bind(position);
 
-        // Is this (setOnCheckedChangeListener) gets triggered on RecyclerView's scroll?
-        /*holder.checkedTask.setOnCheckedChangeListener((compoundButton, b) -> {
-            mainViewModel.setTaskIsComplete(task.getId(), b);
-        });*/
-
+        // Can be replaced with onCheckedChangeListener
+        //  WARNING: onCheckedChangeListener gets triggered on RecyclerView scrolling
+        //  so double checking with compoundButton.isPressed() is necessary!
         holder.checkedTask.setOnClickListener(view -> {
             mainViewModel.setTaskIsComplete(position, !task.getIsComplete());
             if (holder.checkedTask.isChecked()) {
@@ -63,37 +84,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             }
         });
 
-        // TODO: Implement Task renaming (using a Fragment?)
-        holder.taskTitle.setOnLongClickListener(view -> {
-            Toast.makeText(view.getContext(), "Rename Task", Toast.LENGTH_SHORT).show();
+        holder.itemView.setOnLongClickListener(view -> {
+            if (todoItemActionsListener == null ) {
+                return false;
+            }
+            todoItemActionsListener.onItemRename(position);
             return false;
         });
 
         holder.removeButton.setOnClickListener(view -> {
-            mainViewModel.removeFromTasks(position).subscribe(new Observer<List<Task>>() {
-                @Override
-                public void onSubscribe(Disposable d) {
-                    compositeDisposable.add(d);
-                }
-
-                @Override
-                public void onNext(List<Task> tasks) {
-                    taskList = tasks;
-                    notifyDataSetChanged();
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    Log.e("removeFromTasks", e.getMessage());
-                    Toast.makeText(view.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onComplete() {
-
-                }
-            });
-
+            if (todoItemActionsListener == null) {
+                return;
+            }
+            Log.d("removeItem", "Position of item to be removed: " + position);
+            todoItemActionsListener.onItemDelete(position);
         });
 
     }

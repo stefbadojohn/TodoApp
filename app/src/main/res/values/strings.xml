@@ -7,5 +7,8 @@
     <string name="hint_task_name">Title</string>
     <string name="hint_task_Description">Description</string>
     <string name="x_button">x</string>
+    <string name="edit_task">Edit Task</string>
+    <string name="rename_task">Rename</string>
+    <string name="cancel_rename">Cancel</string>
 
 </resources>

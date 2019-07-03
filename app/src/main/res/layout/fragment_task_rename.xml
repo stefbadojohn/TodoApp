@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainActivity"
+    android:background="#99000000">
+
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_centerVertical="true"
+        android:background="@drawable/rename_task_background"
+        android:layout_margin="8dp">
+
+        <TextView
+            android:id="@+id/renameTaskTextView"
+            android:textColor="#555555"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_task"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp" />
+
+        <EditText
+            android:id="@+id/taskNewTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/renameTaskTextView"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:inputType="textMultiLine" />
+
+        <Button
+            android:id="@+id/renameButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="@string/rename_task"
+            android:layout_below="@+id/taskNewTitle"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_alignParentRight="true"/>
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="@string/cancel_rename"
+            android:layout_below="@+id/taskNewTitle"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_alignParentLeft="true"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

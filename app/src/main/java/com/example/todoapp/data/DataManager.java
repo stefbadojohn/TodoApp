@@ -19,19 +19,22 @@ public class DataManager {
 
     public int addToTasks(Task task) {
         tasks.add(task);
-        //task.setId(tasks.size()-1);
         return tasks.size();
+    }
+
+    public Task getTask(int position) {
+        return tasks.get(position);
     }
 
     public void removeFromTasks(int position) {
         tasks.remove(position);
     }
 
-    public void setTaskIsComplete(int id, boolean complete) {
-        tasks.get(id).setIsComplete(complete);
+    public void setTaskIsComplete(int position, boolean complete) {
+        tasks.get(position).setIsComplete(complete);
     }
 
-    public void setTaskTitle(int id, String title) {
-        tasks.get(id).setTitle(title);
+    public void renameTask(int position, String title) {
+        tasks.get(position).setTitle(title);
     }
 }

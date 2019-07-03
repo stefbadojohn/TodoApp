@@ -1,11 +1,18 @@
 package com.example.todoapp.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -35,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
 
     MainViewModel mainViewModel;
 
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    TaskRenameFragment taskRenameFragment;
+
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
@@ -45,7 +55,18 @@ public class MainActivity extends AppCompatActivity {
 
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
-        taskAdapter = new TaskAdapter(mainViewModel,taskList);
+        taskAdapter = new TaskAdapter(mainViewModel, taskList, new TodoItemActionsListener() {
+            @Override
+            public void onItemRename(int position) {
+                renameTask(position);
+            }
+
+            @Override
+            public void onItemDelete(int position) {
+                deleteTask(position);
+            }
+        });
+
         taskRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         taskRecyclerView.setAdapter(taskAdapter);
 
@@ -57,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         //setTasks();
+        removeTaskRenameFragment();
         compositeDisposable.clear();
     }
 
@@ -75,9 +97,7 @@ public class MainActivity extends AppCompatActivity {
         mainViewModel.getTasks().subscribe(new Observer<List<Task>>() {
             @Override
             public void onSubscribe(Disposable d) {
-/*
                 compositeDisposable.add(d);
-*/
             }
 
             @Override
@@ -85,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
                 if (tasks == null) {
                     return;
                 }
-                addAllToTaskList(tasks);
+                taskList = tasks;
+                taskAdapter.setTaskList(tasks);
             }
 
             @Override
@@ -101,35 +122,56 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void addAllToTaskList(List<Task> tasks) {
-        taskList.addAll(tasks);
-        notifyDataChanged();
-    }
-
-    public void notifyDataChanged() {
-        taskAdapter.notifyDataSetChanged();
-    }
-
-    public void notifyItemInserted() {
-        int countTasks = taskAdapter.getItemCount();
-        taskAdapter.notifyItemInserted(countTasks);
-        taskRecyclerView.scrollToPosition(countTasks-1);
-    }
-
     public void addTask() {
         String newTaskTitle = taskTitle.getText().toString();
         if (newTaskTitle.equals("")) {
             return;
         }
         Task task = new Task(newTaskTitle);
-        mainViewModel.addToTasks(task);
         taskList.add(task);
+        taskAdapter.notifyItemInserted(taskList.size());
+        taskRecyclerView.scrollToPosition(taskAdapter.getItemCount()-1);
         clearNewTaskTitle();
-        notifyItemInserted();
     }
 
     public void clearNewTaskTitle() {
         taskTitle.setText("");
+    }
+
+    public void deleteTask(int position) {
+        Log.d("taskActions", "taskList.size before delete : " + taskList.size());
+
+        mainViewModel.removeFromTasks(position);
+        getTasks();
+        Log.d("removeItem", "Notify of removed item on: " + position);
+        taskAdapter.notifyItemRemoved(position);
+    }
+
+    public void renameTask(int position) {
+        String taskOldTitle = mainViewModel.getTask(position).getTitle();
+        taskRenameFragment = new TaskRenameFragment(taskOldTitle, new TaskRenameActionsListener() {
+            @Override
+            public void onCancel() {
+                removeTaskRenameFragment();
+            }
+
+            @Override
+            public void onRename(String taskNewTitle) {
+                mainViewModel.renameTask(position, taskNewTitle);
+                taskAdapter.notifyDataSetChanged();
+                removeTaskRenameFragment();
+            }
+        });
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.taskRenameFragmentContainer, taskRenameFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    public void removeTaskRenameFragment() {
+        if (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStack();
+        }
     }
 
 }

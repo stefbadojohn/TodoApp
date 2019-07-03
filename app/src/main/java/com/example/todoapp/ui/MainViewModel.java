@@ -5,9 +5,6 @@ import com.example.todoapp.data.DataManager;
 import com.example.todoapp.data.model.Task;
 import java.util.List;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
 
 public class MainViewModel extends ViewModel {
 
@@ -15,6 +12,10 @@ public class MainViewModel extends ViewModel {
 
     public Observable<List<Task>> getTasks() {
         return Observable.just(dataManager.getTasks());
+    }
+
+    public Task getTask(int position) {
+        return dataManager.getTask(position);
     }
 
     public void setTasks(List<Task> tasks) {
@@ -25,16 +26,15 @@ public class MainViewModel extends ViewModel {
         dataManager.addToTasks(task);
     }
 
-    public Observable<List<Task>> removeFromTasks(int position) {
+    public void removeFromTasks(int position) {
         dataManager.removeFromTasks(position);
-        return getTasks();
     }
 
     public void setTaskIsComplete(int id, boolean isComplete) {
         dataManager.setTaskIsComplete(id, isComplete);
     }
 
-    public void setTaskTitle(int id, String title) {
-        dataManager.setTaskTitle(id, title);
+    public void renameTask(int position, String title) {
+        dataManager.renameTask(position, title);
     }
 }
