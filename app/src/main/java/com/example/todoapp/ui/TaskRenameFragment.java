@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -13,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.todoapp.R;
+import com.example.todoapp.util.ViewUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,12 +54,18 @@ public class TaskRenameFragment extends Fragment {
 
         taskNewTitle.setText(taskOldTitle);
 
-        renameButton.setOnClickListener(v ->
-                //HideKeyboard
-                taskRenameActionsListener.onRename(taskNewTitle.getText().toString()));
-        cancelButton.setOnClickListener(v ->
-                //HideKeyboard
-                taskRenameActionsListener.onCancel());
+        renameButton.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                ViewUtil.hideKeyboard(getActivity());
+            }
+            taskRenameActionsListener.onRename(taskNewTitle.getText().toString());
+        });
+        cancelButton.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                ViewUtil.hideKeyboard(getActivity());
+            }
+            taskRenameActionsListener.onCancel();
+        });
 
         return view;
     }
@@ -68,8 +74,9 @@ public class TaskRenameFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         taskNewTitle.requestFocus();
-        //ShowKeyboard
-
+        if (getActivity() != null) {
+            ViewUtil.showKeyboard(getActivity());
+        }
     }
-    // TODO: 03-Jul-19 Implement Show/Hide Keyboard
+
 }

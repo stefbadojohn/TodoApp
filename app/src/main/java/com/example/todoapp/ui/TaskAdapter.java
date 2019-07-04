@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.todoapp.R;
@@ -17,9 +17,7 @@ import com.example.todoapp.data.model.Task;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observer;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
@@ -70,7 +68,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
         holder.taskTitle.setText(task.getTitle());
 
-        holder.bind(position);
+        holder.setTaskItemChecked(position);
 
         // Can be replaced with onCheckedChangeListener
         //  WARNING: onCheckedChangeListener gets triggered on RecyclerView scrolling
@@ -122,7 +120,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             ButterKnife.bind(this, itemView);
         }
 
-        void bind(int position) {
+        void setTaskItemChecked(int position) {
             if (taskList.get(position).getIsComplete()) {
                 checkedTask.setChecked(true);
                 taskTitle.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
