@@ -18,7 +18,7 @@ public class DataManager {
     }
 
     public int addToTasks(Task task) {
-        tasks.add(task);
+        tasks.add(0, task);
         return tasks.size();
     }
 

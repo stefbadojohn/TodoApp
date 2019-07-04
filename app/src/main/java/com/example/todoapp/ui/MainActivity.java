@@ -128,9 +128,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         Task task = new Task(newTaskTitle);
-        taskList.add(task);
-        taskAdapter.notifyItemInserted(taskList.size());
-        taskRecyclerView.scrollToPosition(taskAdapter.getItemCount()-1);
+        taskList.add(0, task);
+        taskAdapter.notifyItemInserted(0);
+        taskRecyclerView.scrollToPosition(0);
         clearNewTaskTitle();
     }
 
