@@ -26,6 +26,7 @@
             android:id="@+id/taskNewTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxHeight="350dp"
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/renameTaskTextView"
             android:layout_marginStart="16dp"

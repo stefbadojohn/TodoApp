@@ -2,6 +2,7 @@ package com.example.todoapp.ui;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.todoapp.R;
@@ -82,6 +82,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             }
         });
 
+        holder.itemView.setOnClickListener(view -> {
+            holder.switchTaskTitleMaxLines();
+        });
+
         holder.itemView.setOnLongClickListener(view -> {
             if (todoItemActionsListener == null ) {
                 return false;
@@ -127,6 +131,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             } else {
                 checkedTask.setChecked(false);
                 taskTitle.setPaintFlags(0);
+            }
+        }
+
+        void switchTaskTitleMaxLines() {
+            if (taskTitle.getMaxLines() == 1) {
+                taskTitle.setMaxLines(Integer.MAX_VALUE);
+                taskTitle.setEllipsize(null);
+            } else {
+                taskTitle.setMaxLines(1);
+                taskTitle.setEllipsize(TextUtils.TruncateAt.END);
             }
         }
     }
