@@ -11,7 +11,7 @@ public class MainViewModel extends ViewModel {
     private DataManager dataManager = new DataManager();
 
     public Observable<List<Task>> getTasks() {
-        return Observable.just(dataManager.getTasks());
+        return Observable.just(dataManager.getTasksFromDb());
     }
 
     public Task getTask(int position) {
@@ -34,7 +34,7 @@ public class MainViewModel extends ViewModel {
         dataManager.setTaskIsComplete(id, isComplete);
     }
 
-    public void renameTask(int position, String title) {
-        dataManager.renameTask(position, title);
+    public void renameTask(int taskId, String title) {
+        dataManager.renameTask(taskId, title);
     }
 }

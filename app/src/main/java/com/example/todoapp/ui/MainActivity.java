@@ -25,6 +25,8 @@ import butterknife.ButterKnife;
 import io.reactivex.Observer;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.realm.Realm;
+import io.realm.RealmChangeListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,13 +59,13 @@ public class MainActivity extends AppCompatActivity {
 
         taskAdapter = new TaskAdapter(mainViewModel, taskList, new TodoItemActionsListener() {
             @Override
-            public void onItemRename(int position) {
-                renameTask(position);
+            public void onItemRename(int taskId) {
+                renameTask(taskId);
             }
 
             @Override
-            public void onItemDelete(int position) {
-                deleteTask(position);
+            public void onItemDelete(int taskId) {
+                deleteTask(taskId);
             }
         });
 
@@ -71,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         taskRecyclerView.setAdapter(taskAdapter);
 
         addButton.setOnClickListener(view -> addTask());
-
     }
 
     @Override
@@ -93,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getTasks() {
-
         mainViewModel.getTasks().subscribe(new Observer<List<Task>>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Task task = new Task(newTaskTitle);
         taskList.add(0, task);
+        mainViewModel.addToTasks(task);
         taskAdapter.notifyItemInserted(0);
         taskRecyclerView.scrollToPosition(0);
         clearNewTaskTitle();
@@ -138,17 +139,14 @@ public class MainActivity extends AppCompatActivity {
         taskTitle.setText("");
     }
 
-    public void deleteTask(int position) {
+    public void deleteTask(int taskId) {
         Log.d("taskActions", "taskList.size before delete : " + taskList.size());
-
-        mainViewModel.removeFromTasks(position);
+        mainViewModel.removeFromTasks(taskId);
         getTasks();
-        Log.d("removeItem", "Notify of removed item on: " + position);
-        taskAdapter.notifyItemRemoved(position);
     }
 
-    public void renameTask(int position) {
-        String taskOldTitle = mainViewModel.getTask(position).getTitle();
+    public void renameTask(int itemId) {
+        String taskOldTitle = mainViewModel.getTask(itemId).getTitle();
         taskRenameFragment = new TaskRenameFragment(taskOldTitle, new TaskRenameActionsListener() {
             @Override
             public void onCancel() {
@@ -157,11 +155,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onRename(String taskNewTitle) {
-                mainViewModel.renameTask(position, taskNewTitle);
-                taskAdapter.notifyDataSetChanged();
+                mainViewModel.renameTask(itemId, taskNewTitle);
                 removeTaskRenameFragment();
+                getTasks();
+                taskAdapter.notifyDataSetChanged();
             }
         });
+
+        createTaskRenameFragment();
+    }
+
+    public void createTaskRenameFragment() {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.taskRenameFragmentContainer, taskRenameFragment);
         fragmentTransaction.addToBackStack(null);

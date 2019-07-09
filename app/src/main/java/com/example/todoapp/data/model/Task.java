@@ -1,9 +1,16 @@
 package com.example.todoapp.data.model;
 
-public class Task {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class Task extends RealmObject {
+    @PrimaryKey
     private int id;
     private String title;
     private boolean isComplete;
+
+    public Task() {
+    }
 
     public Task(String title) {
         this.title = title;

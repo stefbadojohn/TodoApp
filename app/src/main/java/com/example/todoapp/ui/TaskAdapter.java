@@ -22,8 +22,7 @@ import io.reactivex.disposables.CompositeDisposable;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private List<Task> taskList;
-    MainViewModel mainViewModel;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private MainViewModel mainViewModel;
 
     private TodoItemActionsListener todoItemActionsListener;
 
@@ -72,7 +71,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
         // Can be replaced with onCheckedChangeListener
         //  WARNING: onCheckedChangeListener gets triggered on RecyclerView scrolling
-        //  so double checking with compoundButton.isPressed() is necessary!
+        //  so double checking with compoundButton.isPressed() might be necessary!
         holder.checkedTask.setOnClickListener(view -> {
             mainViewModel.setTaskIsComplete(position, !task.getIsComplete());
             if (holder.checkedTask.isChecked()) {
@@ -90,7 +89,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             if (todoItemActionsListener == null ) {
                 return false;
             }
-            todoItemActionsListener.onItemRename(position);
+            todoItemActionsListener.onItemRename(taskList.get(position).getId());
             return false;
         });
 
@@ -99,7 +98,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                 return;
             }
             Log.d("removeItem", "Position of item to be removed: " + position);
-            todoItemActionsListener.onItemDelete(position);
+
+            int itemId = taskList.get(position).getId();
+
+            Log.d("removeItem", "Items id: " + itemId);
+            todoItemActionsListener.onItemDelete(itemId);
+            Log.d("removeItem", "Notify of removed item on: " + position);
+            notifyItemRemoved(position);
         });
 
     }
@@ -107,6 +112,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return taskList.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return super.getItemId(position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
