@@ -65,15 +65,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             return;
         }
 
-        holder.taskTitle.setText(task.getTitle());
+        holder.taskTitle.setText(task.getTitle()); // Sets title
 
-        holder.setTaskItemChecked(position);
+        holder.setTaskItemChecked(position); // Set checked
 
         // Can be replaced with onCheckedChangeListener
         //  WARNING: onCheckedChangeListener gets triggered on RecyclerView scrolling
         //  so double checking with compoundButton.isPressed() might be necessary!
-        holder.checkedTask.setOnClickListener(view -> {
-            mainViewModel.setTaskIsComplete(position, !task.getIsComplete());
+        holder.checkedTask.setOnClickListener(view -> { // Set (custom?) onCheckedChangeListener
+            int itemPosition = holder.getAdapterPosition();
+            mainViewModel.setTaskIsComplete(taskList.get(itemPosition).getId(), !taskList.get(itemPosition).getIsComplete());
             if (holder.checkedTask.isChecked()) {
                 holder.taskTitle.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
@@ -81,15 +82,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             }
         });
 
-        holder.itemView.setOnClickListener(view -> {
-            holder.switchTaskTitleMaxLines();
-        });
+        holder.itemView.setOnClickListener(view -> holder.switchTaskTitleMaxLines());
 
         holder.itemView.setOnLongClickListener(view -> {
             if (todoItemActionsListener == null ) {
                 return false;
             }
-            todoItemActionsListener.onItemRename(taskList.get(position).getId());
+            int itemPosition = holder.getAdapterPosition();
+            todoItemActionsListener.onItemRename(taskList.get(itemPosition).getId());
             return false;
         });
 
@@ -114,11 +114,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         return taskList.size();
     }
 
-    @Override
-    public long getItemId(int position) {
-        return super.getItemId(position);
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.taskTitle)
         TextView taskTitle;
@@ -135,7 +130,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         }
 
         void setTaskItemChecked(int position) {
-            if (taskList.get(position).getIsComplete()) {
+            if (taskList.get(getAdapterPosition()).getIsComplete()) {
                 checkedTask.setChecked(true);
                 taskTitle.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
             } else {

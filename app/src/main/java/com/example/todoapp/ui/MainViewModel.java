@@ -14,16 +14,16 @@ public class MainViewModel extends ViewModel {
         return Observable.just(dataManager.getTasksFromDb());
     }
 
-    public Task getTask(int position) {
-        return dataManager.getTask(position);
+    public Task getTask(int taskId) {
+        return dataManager.getTask(taskId);
     }
 
     public void setTasks(List<Task> tasks) {
         dataManager.setTasks(tasks);
     }
 
-    public void addToTasks(Task task) {
-        dataManager.addToTasks(task);
+    public Task addToTasks(String newTaskTitle) {
+        return dataManager.addToTasks(newTaskTitle);
     }
 
     public void removeFromTasks(int position) {

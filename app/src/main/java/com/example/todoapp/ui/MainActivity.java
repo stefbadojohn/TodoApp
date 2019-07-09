@@ -127,9 +127,9 @@ public class MainActivity extends AppCompatActivity {
         if (newTaskTitle.equals("")) {
             return;
         }
-        Task task = new Task(newTaskTitle);
+
+        Task task = mainViewModel.addToTasks(newTaskTitle);
         taskList.add(0, task);
-        mainViewModel.addToTasks(task);
         taskAdapter.notifyItemInserted(0);
         taskRecyclerView.scrollToPosition(0);
         clearNewTaskTitle();
@@ -140,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void deleteTask(int taskId) {
-        Log.d("taskActions", "taskList.size before delete : " + taskList.size());
         mainViewModel.removeFromTasks(taskId);
         getTasks();
     }

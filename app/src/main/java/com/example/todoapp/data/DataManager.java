@@ -32,11 +32,13 @@ public class DataManager {
         //this.tasks = tasks;
     }
 
-    public void addToTasks(Task task) {
-        realm.executeTransaction(realm -> {
-            task.setId(getNextTaskId());
-            realm.insertOrUpdate(task);
-        });
+    public Task addToTasks(String newTaskTitle) {
+        realm.beginTransaction();
+        Task task = realm.createObject(Task.class, getNextTaskId());
+        task.setTitle(newTaskTitle);
+        realm.commitTransaction();
+
+        return task;
     }
 
     public Task getTask(int taskId) {
@@ -62,8 +64,6 @@ public class DataManager {
     }
 
     public void renameTask(int taskId, String title) {
-        // TODO: 08-Jul-19 Fix rename (on MainActivity?)
-        //  to update RecyclerView's Item with the new name
         realm.executeTransaction(realm -> {
             Task task = realm.where(Task.class).equalTo("id", taskId).findFirst();
             if (task != null && title != null) {
