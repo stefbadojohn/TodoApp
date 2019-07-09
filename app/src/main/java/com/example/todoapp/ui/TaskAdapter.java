@@ -22,7 +22,6 @@ import io.reactivex.disposables.CompositeDisposable;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private List<Task> taskList;
-    private MainViewModel mainViewModel;
 
     private TodoItemActionsListener todoItemActionsListener;
 
@@ -35,8 +34,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public TaskAdapter(MainViewModel viewModel, List<Task> taskList, TodoItemActionsListener todoItemActionsListener) {
-        mainViewModel = viewModel;
+    public TaskAdapter(List<Task> taskList, TodoItemActionsListener todoItemActionsListener) {
         this.taskList = taskList;
         this.todoItemActionsListener = todoItemActionsListener;
     }
@@ -65,20 +63,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             return;
         }
 
-        holder.taskTitle.setText(task.getTitle()); // Sets title
+        holder.taskTitle.setText(task.getTitle()); // Set title
 
         holder.setTaskItemChecked(position); // Set checked
 
-        // Can be replaced with onCheckedChangeListener
-        //  WARNING: onCheckedChangeListener gets triggered on RecyclerView scrolling
-        //  so double checking with compoundButton.isPressed() might be necessary!
-        holder.checkedTask.setOnClickListener(view -> { // Set (custom?) onCheckedChangeListener
-            int itemPosition = holder.getAdapterPosition();
-            mainViewModel.setTaskIsComplete(taskList.get(itemPosition).getId(), !taskList.get(itemPosition).getIsComplete());
-            if (holder.checkedTask.isChecked()) {
-                holder.taskTitle.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-            } else {
-                holder.taskTitle.setPaintFlags(0);
+        holder.checkedTask.setOnCheckedChangeListener((compoundButton, b) -> {
+            // Check if user actually clicked the checkbox or
+            // onCheckedChangeListener got triggered just by scrolling
+            if (compoundButton.isPressed()) {
+                int itemPosition = holder.getAdapterPosition();
+
+                if (todoItemActionsListener == null) {
+                    return;
+                }
+
+                todoItemActionsListener.onItemCheckedChange(taskList.get(itemPosition).getId(), b);
             }
         });
 
@@ -94,14 +93,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         });
 
         holder.removeButton.setOnClickListener(view -> {
+            int itemPosition = holder.getAdapterPosition();
+
             if (todoItemActionsListener == null) {
                 return;
             }
             Log.d("removeItem", "Position of item to be removed: " + position);
 
-            int itemId = taskList.get(position).getId();
+            int itemId = taskList.get(itemPosition).getId();
 
-            Log.d("removeItem", "Items id: " + itemId);
+            Log.d("removeItem", "Task id: " + itemId);
             todoItemActionsListener.onItemDelete(itemId);
             Log.d("removeItem", "Notify of removed item on: " + position);
             notifyItemRemoved(position);
@@ -130,7 +131,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         }
 
         void setTaskItemChecked(int position) {
-            if (taskList.get(getAdapterPosition()).getIsComplete()) {
+            if (taskList.get(position).getIsComplete()) {
                 checkedTask.setChecked(true);
                 taskTitle.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
