@@ -22,8 +22,6 @@ import io.reactivex.disposables.CompositeDisposable;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     private List<Task> taskList;
-    MainViewModel mainViewModel;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private TodoItemActionsListener todoItemActionsListener;
 
@@ -33,11 +31,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     public void setTaskList(List<Task> taskList) {
         this.taskList = taskList;
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
-    public TaskAdapter(MainViewModel viewModel, List<Task> taskList, TodoItemActionsListener todoItemActionsListener) {
-        mainViewModel = viewModel;
+    public TaskAdapter(List<Task> taskList, TodoItemActionsListener todoItemActionsListener) {
         this.taskList = taskList;
         this.todoItemActionsListener = todoItemActionsListener;
     }
@@ -66,40 +63,47 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             return;
         }
 
-        holder.taskTitle.setText(task.getTitle());
+        holder.taskTitle.setText(task.getTitle()); // Set title
 
-        holder.setTaskItemChecked(position);
+        holder.setTaskItemChecked(position); // Set checked
 
-        // Can be replaced with onCheckedChangeListener
-        //  WARNING: onCheckedChangeListener gets triggered on RecyclerView scrolling
-        //  so double checking with compoundButton.isPressed() is necessary!
-        holder.checkedTask.setOnClickListener(view -> {
-            mainViewModel.setTaskIsComplete(position, !task.getIsComplete());
-            if (holder.checkedTask.isChecked()) {
-                holder.taskTitle.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-            } else {
-                holder.taskTitle.setPaintFlags(0);
+        holder.checkedTask.setOnCheckedChangeListener((compoundButton, b) -> { // Checked Change
+            // Check if user actually clicked the checkbox or
+            // onCheckedChangeListener got triggered just by scrolling
+            if (compoundButton.isPressed()) {
+                int itemPosition = holder.getAdapterPosition();
+                if (todoItemActionsListener == null || itemPosition == -1) {
+                    return;
+                }
+                todoItemActionsListener.onItemCheckedChange(itemPosition, taskList.get(itemPosition).getId(), b);
+
+                if (b) {
+                    holder.taskTitle.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    holder.taskTitle.setPaintFlags(0);
+                }
             }
         });
 
-        holder.itemView.setOnClickListener(view -> {
-            holder.switchTaskTitleMaxLines();
-        });
+        holder.itemView.setOnClickListener(view -> holder.switchTaskTitleMaxLines()); // Expand Task
 
-        holder.itemView.setOnLongClickListener(view -> {
-            if (todoItemActionsListener == null ) {
+        holder.itemView.setOnLongClickListener(view -> { // Rename Task
+            int itemPosition = holder.getAdapterPosition();
+            if (todoItemActionsListener == null || itemPosition == -1) {
                 return false;
             }
-            todoItemActionsListener.onItemRename(position);
+            todoItemActionsListener.onItemRename(itemPosition, taskList.get(itemPosition).getId());
             return false;
         });
 
-        holder.removeButton.setOnClickListener(view -> {
-            if (todoItemActionsListener == null) {
+        holder.removeButton.setOnClickListener(view -> { // Remove Task
+            int itemPosition = holder.getAdapterPosition();
+            if (todoItemActionsListener == null || itemPosition == -1) {
                 return;
             }
-            Log.d("removeItem", "Position of item to be removed: " + position);
-            todoItemActionsListener.onItemDelete(position);
+            int itemId = taskList.get(itemPosition).getId();
+
+            todoItemActionsListener.onItemDelete(itemPosition, itemId);
         });
 
     }
