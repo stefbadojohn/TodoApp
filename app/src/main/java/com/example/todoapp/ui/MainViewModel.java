@@ -2,16 +2,17 @@ package com.example.todoapp.ui;
 
 import androidx.lifecycle.ViewModel;
 import com.example.todoapp.data.DataManager;
+import com.example.todoapp.data.DataManagerInterface;
 import com.example.todoapp.data.model.Task;
 import java.util.List;
 import io.reactivex.Observable;
 
 public class MainViewModel extends ViewModel {
 
-    private DataManager dataManager = new DataManager();
+    private DataManagerInterface dataManager = DataManagerInterface.instance;
 
     public Observable<List<Task>> getTasks() {
-        return Observable.just(dataManager.getTasksFromDb());
+        return Observable.just(dataManager.getTasks());
     }
 
     public Task getTask(int taskId) {

@@ -6,8 +6,10 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-public class DataManager {
+public class DataManager implements DataManagerInterface {
     private Realm realm = Realm.getDefaultInstance();
+
+    // TODO: 10-Jul-19 Find a way to close realm
 
     private int getNextTaskId() {
         int nextId;
@@ -22,7 +24,7 @@ public class DataManager {
         return nextId;
     }
 
-    public List<Task> getTasksFromDb() {
+    public List<Task> getTasks() {
         RealmResults<Task> realmResults = realm.where(Task.class).sort("id", Sort.DESCENDING).findAll();
         return realm.copyFromRealm(realmResults);
     }
