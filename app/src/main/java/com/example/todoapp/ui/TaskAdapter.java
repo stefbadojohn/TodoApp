@@ -31,7 +31,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     public void setTaskList(List<Task> taskList) {
         this.taskList = taskList;
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
     public TaskAdapter(List<Task> taskList, TodoItemActionsListener todoItemActionsListener) {
@@ -67,45 +67,43 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
         holder.setTaskItemChecked(position); // Set checked
 
-        holder.checkedTask.setOnCheckedChangeListener((compoundButton, b) -> {
+        holder.checkedTask.setOnCheckedChangeListener((compoundButton, b) -> { // Checked Change
             // Check if user actually clicked the checkbox or
             // onCheckedChangeListener got triggered just by scrolling
             if (compoundButton.isPressed()) {
                 int itemPosition = holder.getAdapterPosition();
-
-                if (todoItemActionsListener == null) {
+                if (todoItemActionsListener == null || itemPosition == -1) {
                     return;
                 }
+                todoItemActionsListener.onItemCheckedChange(itemPosition, taskList.get(itemPosition).getId(), b);
 
-                todoItemActionsListener.onItemCheckedChange(taskList.get(itemPosition).getId(), b);
+                if (b) {
+                    holder.taskTitle.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    holder.taskTitle.setPaintFlags(0);
+                }
             }
         });
 
-        holder.itemView.setOnClickListener(view -> holder.switchTaskTitleMaxLines());
+        holder.itemView.setOnClickListener(view -> holder.switchTaskTitleMaxLines()); // Expand Task
 
-        holder.itemView.setOnLongClickListener(view -> {
-            if (todoItemActionsListener == null ) {
+        holder.itemView.setOnLongClickListener(view -> { // Rename Task
+            int itemPosition = holder.getAdapterPosition();
+            if (todoItemActionsListener == null || itemPosition == -1) {
                 return false;
             }
-            int itemPosition = holder.getAdapterPosition();
-            todoItemActionsListener.onItemRename(taskList.get(itemPosition).getId());
+            todoItemActionsListener.onItemRename(itemPosition, taskList.get(itemPosition).getId());
             return false;
         });
 
-        holder.removeButton.setOnClickListener(view -> {
+        holder.removeButton.setOnClickListener(view -> { // Remove Task
             int itemPosition = holder.getAdapterPosition();
-
-            if (todoItemActionsListener == null) {
+            if (todoItemActionsListener == null || itemPosition == -1) {
                 return;
             }
-            Log.d("removeItem", "Position of item to be removed: " + position);
-
             int itemId = taskList.get(itemPosition).getId();
 
-            Log.d("removeItem", "Task id: " + itemId);
-            todoItemActionsListener.onItemDelete(itemId);
-            Log.d("removeItem", "Notify of removed item on: " + position);
-            notifyItemRemoved(position);
+            todoItemActionsListener.onItemDelete(itemPosition, itemId);
         });
 
     }

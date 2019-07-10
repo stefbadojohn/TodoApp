@@ -26,8 +26,8 @@ public class MainViewModel extends ViewModel {
         return dataManager.addToTasks(newTaskTitle);
     }
 
-    public void removeFromTasks(int position) {
-        dataManager.removeFromTasks(position);
+    public void removeFromTasks(int taskId) {
+        dataManager.removeFromTasks(taskId);
     }
 
     public void setTaskIsComplete(int id, boolean isComplete) {

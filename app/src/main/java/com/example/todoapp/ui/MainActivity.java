@@ -54,18 +54,18 @@ public class MainActivity extends AppCompatActivity {
 
         taskAdapter = new TaskAdapter(taskList, new TodoItemActionsListener() {
             @Override
-            public void onItemRename(int taskId) {
-                renameTask(taskId);
+            public void onItemRename(int position, int taskId) {
+                renameTask(position, taskId);
             }
 
             @Override
-            public void onItemDelete(int taskId) {
-                deleteTask(taskId);
+            public void onItemDelete(int position, int taskId) {
+                deleteTask(position, taskId);
             }
 
             @Override
-            public void onItemCheckedChange(int taskId, boolean checked) {
-                changeTaskIsComplete(taskId, checked);
+            public void onItemCheckedChange(int position, int taskId, boolean checked) {
+                changeTaskIsComplete(position, taskId, checked);
             }
 
         });
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         getTasks();
+        taskAdapter.notifyDataSetChanged();
     }
 
     public void setTasks() {
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 taskList = tasks;
-                taskAdapter.setTaskList(tasks); // Is this necessary?
+                taskAdapter.setTaskList(tasks);
             }
 
             @Override
@@ -141,12 +142,13 @@ public class MainActivity extends AppCompatActivity {
         taskTitle.setText("");
     }
 
-    public void deleteTask(int taskId) {
+    public void deleteTask(int position, int taskId) {
         mainViewModel.removeFromTasks(taskId);
         getTasks();
+        taskAdapter.notifyItemRemoved(position);
     }
 
-    public void renameTask(int taskId) {
+    public void renameTask(int position, int taskId) {
         String taskOldTitle = mainViewModel.getTask(taskId).getTitle();
         taskRenameFragment = new TaskRenameFragment(taskOldTitle, new TaskRenameActionsListener() {
             @Override
@@ -159,16 +161,19 @@ public class MainActivity extends AppCompatActivity {
                 mainViewModel.renameTask(taskId, taskNewTitle);
                 removeTaskRenameFragment();
                 getTasks();
-                taskAdapter.notifyDataSetChanged();
+                taskAdapter.notifyItemChanged(position);
             }
         });
 
         createTaskRenameFragment();
     }
 
-    public void changeTaskIsComplete(int taskId, boolean checked) {
+    public void changeTaskIsComplete(int position, int taskId, boolean checked) {
         mainViewModel.setTaskIsComplete(taskId, checked);
         getTasks();
+        // Do not use notifyItemChanged instead setPaintFlags in
+        // TaskAdapter's onCheckedChangeListener to avoid task expansion/contraction
+        //taskAdapter.notifyItemChanged(position);
     }
 
     public void createTaskRenameFragment() {
